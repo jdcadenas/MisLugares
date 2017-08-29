@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/TextView01"
+    android:text="Este programa ha sido desarrollado como
+    ejemplo en el curso de Androide para demostrar cómo
+    se puede lanzar actividades desde la actividad principal"
+    >
+
+</TextView>
