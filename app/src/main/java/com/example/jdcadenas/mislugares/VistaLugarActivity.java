@@ -2,11 +2,13 @@ package com.example.jdcadenas.mislugares;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -46,9 +48,15 @@ public class VistaLugarActivity extends AppCompatActivity {
    public boolean onOptionsItemSelected(MenuItem item) {
       switch (item.getItemId()) {
       case R.id.accion_compartir:
-         return true;
-      case R.id.accion_llegar:
-         return true;
+      Intent intent = new Intent(Intent.ACTION_SEND);
+      intent.setType("text/plain");
+      intent.putExtra(Intent.EXTRA_TEXT,
+            lugar.getNombre() + " - " + lugar.getUrl());
+      startActivity(intent);
+      return true;
+   case R.id.accion_llegar:
+      verMapa(null);
+      return true;
       case R.id.accion_editar:
           lanzarEdicion((int) id);
          return true;
@@ -60,6 +68,28 @@ public class VistaLugarActivity extends AppCompatActivity {
          return super.onOptionsItemSelected(item);
       }
    }
+    public void verMapa(View view) {
+        Uri uri;
+        double lat = lugar.getPosicion().getLatitud();
+        double lon = lugar.getPosicion().getLongitud();
+        if (lat != 0 || lon != 0) {
+            uri = Uri.parse("geo:" + lat + "," + lon);
+        } else {
+            uri = Uri.parse("geo:0,0?q=" + lugar.getDireccion());
+        }
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        startActivity(intent);
+    }
+
+    public void llamadaTelefono(View view) {
+        startActivity(new Intent(Intent.ACTION_DIAL,
+                Uri.parse("tel:" + lugar.getTelefono())));
+    }
+    public void pgWeb(View view) {
+        startActivity(new Intent(Intent.ACTION_VIEW,
+                Uri.parse(lugar.getUrl())));
+    }
+
 
    public void lanzarEdicion(final int id){
        Intent i = new Intent(this,EdicionLugarActivity.class);
@@ -83,7 +113,7 @@ public class VistaLugarActivity extends AppCompatActivity {
                .setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
                    @Override
                    public void onClick(DialogInterface dialogInterface, int i) {
-                       MainActivity.lugares.borrar((int) id);
+                       MainActivity.lugares.borrar(id);
                        finish();
                    }
                })
