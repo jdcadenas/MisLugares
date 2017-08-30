@@ -35,24 +35,24 @@ public class MainActivity extends AppCompatActivity {
       //  bacercaDe = (Button) findViewById(R.id.button03);
       //  bSalir = (Button) findViewById(R.id.button04);
        // bPreferencias = (Button) findViewById(R.id.button02);
-        bacercaDe.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                lanzarAcercaDe(null);
-            }
-        });
-        bSalir.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
-        bPreferencias.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                lanzarPreferencias(null);
-            }
-        });
+       // bacercaDe.setOnClickListener(new OnClickListener() {
+       //     @Override
+       //     public void onClick(View view) {
+       //         lanzarAcercaDe(null);
+       //     }
+      //  });
+      //  bSalir.setOnClickListener(new OnClickListener() {
+       //     @Override
+       //     public void onClick(View view) {
+       //         finish();
+      //      }
+     //   });
+      //  bPreferencias.setOnClickListener(new OnClickListener() {
+      //      @Override
+       //     public void onClick(View view) {
+        //        lanzarPreferencias(null);
+       //     }
+     //   });
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         adaptador = new AdaptadorLugares(this, lugares);
