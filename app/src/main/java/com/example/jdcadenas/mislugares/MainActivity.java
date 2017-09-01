@@ -23,10 +23,10 @@ public class MainActivity extends AppCompatActivity {
     private Button bacercaDe;
     private Button bSalir;
     private Button bPreferencias;
-    public static Lugares lugares = new LugaresVector();
+    public static LugaresBD lugares;
     public MediaPlayer mp;
     private RecyclerView recyclerView;
-    public AdaptadorLugares adaptador;
+    public static AdapatadorLugaresBD adaptador;
     private RecyclerView.LayoutManager layoutManager;
 
     @Override
@@ -38,34 +38,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        lugares = new LugaresBD(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mp = MediaPlayer.create(this, R.raw.audio);
         mp.start();
-      //  bacercaDe = (Button) findViewById(R.id.button03);
-      //  bSalir = (Button) findViewById(R.id.button04);
-       // bPreferencias = (Button) findViewById(R.id.button02);
-       // bacercaDe.setOnClickListener(new OnClickListener() {
-       //     @Override
-       //     public void onClick(View view) {
-       //         lanzarAcercaDe(null);
-       //     }
-      //  });
-      //  bSalir.setOnClickListener(new OnClickListener() {
-       //     @Override
-       //     public void onClick(View view) {
-       //         finish();
-      //      }
-     //   });
-      //  bPreferencias.setOnClickListener(new OnClickListener() {
-      //      @Override
-       //     public void onClick(View view) {
-        //        lanzarPreferencias(null);
-       //     }
-     //   });
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        adaptador = new AdaptadorLugares(this, lugares);
+        adaptador = new AdapatadorLugaresBD(this, lugares, lugares.extraeCursor());
         recyclerView.setAdapter(adaptador);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);

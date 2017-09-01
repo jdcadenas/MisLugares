@@ -62,7 +62,7 @@ public class EdicionLugarActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         id =  extras.getInt("id",0);
 
-        lugar = MainActivity.lugares.elemento((int) id);
+        lugar = MainActivity.adaptador.lugarPosicion((int) id);
 
         nombre = (EditText) findViewById(R.id.nombre);
         nombre.setText(lugar.getNombre());
