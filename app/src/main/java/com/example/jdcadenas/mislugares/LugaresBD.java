@@ -69,7 +69,16 @@ public class LugaresBD extends SQLiteOpenHelper implements Lugares {
 
     @Override
     public Lugar elemento(int id) {
-        return null;
+        Lugar lugar = null;
+        SQLiteDatabase bd = getReadableDatabase();
+        Cursor cursor = bd.rawQuery("SELECT * FROM lugares WHERE _id = " + id,
+                null);
+        if (cursor.moveToNext()) {
+            lugar = extraeLugar(cursor);
+        }
+        cursor.close();
+        bd.close();
+        return lugar;
     }
 
     @Override
@@ -79,12 +88,27 @@ public class LugaresBD extends SQLiteOpenHelper implements Lugares {
 
     @Override
     public int nuevo() {
-        return 0;
+        int _id = -1;
+        Lugar lugar = new Lugar();
+        SQLiteDatabase bd = getWritableDatabase();
+        bd.execSQL("INSERT INTO lugares (longitud, latitud, tipo, fecha) " +
+                "VALUES ( " + lugar.getPosicion().getLongitud() + "," +
+                lugar.getPosicion().getLatitud() + ", " +
+                lugar.getTipo().ordinal() + ", " + lugar.getFecha() + ")");
+        Cursor c = bd.rawQuery("SELECT _id FROM lugares WHERE fecha = " +
+                lugar.getFecha(), null);
+        if (c.moveToNext()) {
+            _id = c.getInt(0);
+        }
+        c.close();
+        bd.close();
+        return _id;
     }
 
-    @Override
     public void borrar(int id) {
-
+        SQLiteDatabase bd = getWritableDatabase();
+        bd.execSQL("DELETE FROM lugares WHERE _id = " + id);
+        bd.close();
     }
 
     @Override
@@ -94,7 +118,20 @@ public class LugaresBD extends SQLiteOpenHelper implements Lugares {
 
     @Override
     public void actualiza(int id, Lugar lugar) {
-
+        SQLiteDatabase bd = getWritableDatabase();
+        bd.execSQL("UPDATE lugares SET nombre = '" + lugar.getNombre() +
+                "', direccion = '" + lugar.getDireccion() +
+                "', longitud = " + lugar.getPosicion().getLongitud() +
+                " , latitud = " + lugar.getPosicion().getLatitud() +
+                " , tipo = " + lugar.getTipo().ordinal() +
+                " , foto = '" + lugar.getFoto() +
+                "', telefono = " + lugar.getTelefono() +
+                " , url = '" + lugar.getUrl() +
+                "', comentario = '" + lugar.getComentario() +
+                "', fecha = " + lugar.getFecha() +
+                " , valoracion = " + lugar.getValoracion() +
+                " WHERE _id = " + id);
+        bd.close();
     }
 
     public static Lugar extraeLugar(Cursor cursor) {
@@ -114,7 +151,7 @@ public class LugaresBD extends SQLiteOpenHelper implements Lugares {
     }
 
     public Cursor extraeCursor() {
-        String consulta = "SELECT * FROM lugares where valoracion>1.0 order by nombre limit 4";
+        String consulta = "SELECT * FROM lugares  order by nombre ";
         SQLiteDatabase bd = getReadableDatabase();
         return bd.rawQuery(consulta, null);
     }

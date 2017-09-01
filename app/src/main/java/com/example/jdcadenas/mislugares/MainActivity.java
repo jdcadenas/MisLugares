@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -58,8 +57,10 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                long _id = lugares.nuevo();
+                Intent i = new Intent(MainActivity.this, EdicionLugarActivity.class);
+                i.putExtra("_id", _id);
+                startActivity(i);
             }
         });
 
@@ -73,16 +74,19 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
-    public void lanzarAcercaDe(View view){
-        Intent i = new Intent(this,AcercaDeActivity.class);
+
+    public void lanzarAcercaDe(View view) {
+        Intent i = new Intent(this, AcercaDeActivity.class);
         startActivity(i);
     }
-    public void lanzarPreferencias(View view){
-        Intent i = new Intent(this,ConfigurarActivity.class);
+
+    public void lanzarPreferencias(View view) {
+        Intent i = new Intent(this, ConfigurarActivity.class);
 
         startActivity(i);
     }
-    public void lanzarVistaLugar(View view){
+
+    public void lanzarVistaLugar(View view) {
         final EditText entrada = new EditText(this);
         entrada.setText("0");
         new AlertDialog.Builder(this)
@@ -96,7 +100,8 @@ public class MainActivity extends AppCompatActivity {
                                 VistaLugarActivity.class);
                         i.putExtra("id", id);
                         startActivity(i);
-                    }})
+                    }
+                })
                 .setNegativeButton("Cancelar", null)
                 .show();
     }
@@ -118,15 +123,15 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
 
-        if(id == R.id.acercaDe){
+        if (id == R.id.acercaDe) {
             lanzarAcercaDe(null);
             return true;
         }
-        if(id == R.id.action_settings){
+        if (id == R.id.action_settings) {
             lanzarPreferencias(null);
             return true;
         }
-        if(id == R.id.menu_buscar){
+        if (id == R.id.menu_buscar) {
             lanzarVistaLugar(null);
             return true;
         }

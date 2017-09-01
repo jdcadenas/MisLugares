@@ -14,19 +14,24 @@ import android.widget.Spinner;
 
 public class EdicionLugarActivity extends AppCompatActivity {
 
-   private EditText nombre;
+    private EditText nombre;
     private Spinner tipo;
     private EditText direccion;
     private EditText telefono;
     private EditText url;
-    private  EditText comentario;
+    private EditText comentario;
     private long id;
     private Lugar lugar;
+    private long _id;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.cancelarmenu:
+                if (_id != -1) {
+                    MainActivity.lugares.borrar((int) _id);
+                }
+                finish();
                 return true;
             case R.id.guardar:
                 guardar();
@@ -43,13 +48,23 @@ public class EdicionLugarActivity extends AppCompatActivity {
         lugar.setTelefono(Integer.parseInt(telefono.getText().toString()));
         lugar.setUrl(url.getText().toString());
         lugar.setComentario(comentario.getText().toString());
-        MainActivity.lugares.actualiza((int) id,lugar);
+        if (_id == -1) {
+            _id = MainActivity.adaptador.idPosicion((int) id);
+        }
+        MainActivity.lugares.actualiza((int) _id, lugar);
+        MainActivity.adaptador.setCursor(MainActivity.lugares.extraeCursor());
+
+        if (id != -1) {
+            MainActivity.adaptador.notifyItemChanged((int) id);
+        } else {
+            MainActivity.adaptador.notifyDataSetChanged();
+        }
         finish();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.edicion,menu);
+        getMenuInflater().inflate(R.menu.edicion, menu);
         return true;
     }
 
@@ -60,13 +75,15 @@ public class EdicionLugarActivity extends AppCompatActivity {
 
 
         Bundle extras = getIntent().getExtras();
-        id =  extras.getInt("id",0);
-
-        lugar = MainActivity.adaptador.lugarPosicion((int) id);
-
+        id = extras.getInt("id", -1);
+        _id = extras.getLong("_id", -1);
+        if (_id != -1) {
+            lugar = MainActivity.lugares.elemento((int) _id);
+        } else {
+            lugar = MainActivity.adaptador.lugarPosicion((int) id);
+        }
         nombre = (EditText) findViewById(R.id.nombre);
         nombre.setText(lugar.getNombre());
-
 
 
         direccion = (EditText) findViewById(R.id.direccion);

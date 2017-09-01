@@ -37,56 +37,59 @@ public class VistaLugarActivity extends AppCompatActivity {
     final static int RESULTADO_GALERIA = 2;
     final static int RESULTADO_FOTO = 3;
     private Uri uriFoto;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.vista_lugar);
         Bundle extras = getIntent().getExtras();
-        id = extras.getLong("id",0);
+        id = extras.getLong("id", -1);
         imageView = (ImageView) findViewById(R.id.foto);
-       actualizarVistas();
-        Toast.makeText(this, "onCreate", Toast.LENGTH_SHORT).show();
+        actualizarVistas();
+        //Toast.makeText(this, "creando", Toast.LENGTH_SHORT).show();
 
     }
-   @Override
-   public boolean onCreateOptionsMenu(Menu menu) {
-      getMenuInflater().inflate(R.menu.vista_lugar, menu);
-      return true;
-   }
 
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.vista_lugar, menu);
+        return true;
+    }
 
 
-   @Override
-   public boolean onOptionsItemSelected(MenuItem item) {
-      switch (item.getItemId()) {
-      case R.id.accion_compartir:
-      Intent intent = new Intent(Intent.ACTION_SEND);
-      intent.setType("text/plain");
-      intent.putExtra(Intent.EXTRA_TEXT,
-            lugar.getNombre() + " - " + lugar.getUrl());
-      startActivity(intent);
-      return true;
-   case R.id.accion_llegar:
-      verMapa(null);
-      return true;
-      case R.id.accion_editar:
-          lanzarEdicion((int) id);
-         return true;
-      case R.id.accion_borrar:
-          borrarLugar((int) id);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.accion_compartir:
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                intent.putExtra(Intent.EXTRA_TEXT,
+                        lugar.getNombre() + " - " + lugar.getUrl());
+                startActivity(intent);
+                return true;
+            case R.id.accion_llegar:
+                verMapa(null);
+                return true;
+            case R.id.accion_editar:
+                lanzarEdicion((int) id);
+                return true;
+            case R.id.accion_borrar:
+                int _id = MainActivity.adaptador.idPosicion((int) id);
+                borrarLugar(_id);
 
-         return true;
-      default:
-         return super.onOptionsItemSelected(item);
-      }
-   }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     public void galeria(View view) {
         Intent intent = new Intent(Intent.ACTION_PICK,
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, RESULTADO_GALERIA);
     }
+
     public void verMapa(View view) {
         Uri uri;
         double lat = lugar.getPosicion().getLatitud();
@@ -104,28 +107,29 @@ public class VistaLugarActivity extends AppCompatActivity {
         startActivity(new Intent(Intent.ACTION_DIAL,
                 Uri.parse("tel:" + lugar.getTelefono())));
     }
+
     public void pgWeb(View view) {
         startActivity(new Intent(Intent.ACTION_VIEW,
                 Uri.parse(lugar.getUrl())));
     }
 
 
-   public void lanzarEdicion(final int id){
-       Intent i = new Intent(this,EdicionLugarActivity.class);
-       i.putExtra("id", id);
-       startActivityForResult(i, RESULTADO_EDITAR);
-   }
+    public void lanzarEdicion(final int id) {
+        Intent i = new Intent(this, EdicionLugarActivity.class);
+        i.putExtra("id", id);
+        startActivityForResult(i, RESULTADO_EDITAR);
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == RESULTADO_EDITAR)
-        {
+        if (requestCode == RESULTADO_EDITAR) {
             actualizarVistas();
             findViewById(R.id.scrollView1).invalidate();
         } else if (requestCode == RESULTADO_GALERIA) {
             if (resultCode == Activity.RESULT_OK) {
                 lugar.setFoto(data.getDataString());
                 ponerFoto(imageView, lugar.getFoto());
+                actualizaLugar();
             } else {
                 Toast.makeText(this, "Foto no cargada", Toast.LENGTH_LONG).show();
             }
@@ -134,6 +138,7 @@ public class VistaLugarActivity extends AppCompatActivity {
                     && lugar != null && uriFoto != null) {
                 lugar.setFoto(uriFoto.toString());
                 ponerFoto(imageView, lugar.getFoto());
+                actualizaLugar();
             } else {
                 Toast.makeText(this, "Error en captura", Toast.LENGTH_LONG).show();
             }
@@ -161,27 +166,37 @@ public class VistaLugarActivity extends AppCompatActivity {
         lugar.setFoto(null);
         ponerFoto(imageView, null);
     }
+
     public void borrarLugar(final int id) {
-       new AlertDialog.Builder(this)
-               .setTitle("Borrado de lugar")
-               .setMessage("Está seguro que quieres eliminar este lugar")
-               .setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
-                   @Override
-                   public void onClick(DialogInterface dialogInterface, int i) {
-                       MainActivity.lugares.borrar(id);
-                       finish();
-                   }
-               })
-               .setNegativeButton("cancelar", new DialogInterface.OnClickListener() {
-                   @Override
-                   public void onClick(DialogInterface dialogInterface, int i) {
-                       dialogInterface.cancel();
-                   }
-               })
-               .show();
+        new AlertDialog.Builder(this)
+                .setTitle("Borrado de lugar")
+                .setMessage("Está seguro que quieres eliminar este lugar")
+                .setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        MainActivity.lugares.borrar(id);
+                        MainActivity.adaptador.setCursor(
+                                MainActivity.lugares.extraeCursor());
+                        MainActivity.adaptador.notifyDataSetChanged();
+                        finish();
+                    }
+                })
+                .setNegativeButton("cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                })
+                .show();
 
 
+    }
 
+    void actualizaLugar() {
+        int _id = MainActivity.adaptador.idPosicion((int) id);
+        MainActivity.lugares.actualiza(_id, lugar);
+        MainActivity.adaptador.setCursor(MainActivity.lugares.extraeCursor());
+        MainActivity.adaptador.notifyItemChanged((int) id);
     }
 
     public static Bitmap reduceBitmap(Context contexto, String uri,
@@ -205,8 +220,8 @@ public class VistaLugarActivity extends AppCompatActivity {
         }
     }
 
-public void actualizarVistas(){
-    lugar = MainActivity.adaptador.lugarPosicion((int) id);
+    public void actualizarVistas() {
+        lugar = MainActivity.adaptador.lugarPosicion((int) id);
         TextView nombre = (TextView) findViewById(R.id.nombre);
         nombre.setText(lugar.getNombre());
         ImageView logo_tipo = (ImageView) findViewById(R.id.logo_tipo);
@@ -224,21 +239,22 @@ public void actualizarVistas(){
         comentario.setText(lugar.getComentario());
         TextView fecha = (TextView) findViewById(R.id.fecha);
         fecha.setText(DateFormat.getDateInstance().format(
-            new Date(lugar.getFecha())));
+                new Date(lugar.getFecha())));
         TextView hora = (TextView) findViewById(R.id.hora);
         hora.setText(DateFormat.getTimeInstance().format(
-            new Date(lugar.getFecha())));
+                new Date(lugar.getFecha())));
         RatingBar valoracion = (RatingBar) findViewById(R.id.valoracion);
         valoracion.setRating(lugar.getValoracion());
         valoracion.setOnRatingBarChangeListener(
-            new RatingBar.OnRatingBarChangeListener() {
-                @Override public void onRatingChanged(RatingBar ratingBar,
-                                         float valor, boolean fromUser) {
-                    lugar.setValoracion(valor);
-                }
-        });
-    ponerFoto(imageView, lugar.getFoto());
-}
+                new RatingBar.OnRatingBarChangeListener() {
+                    @Override
+                    public void onRatingChanged(RatingBar ratingBar,
+                                                float valor, boolean fromUser) {
+                        lugar.setValoracion(valor);
+                    }
+                });
+        ponerFoto(imageView, lugar.getFoto());
+    }
 
 
 }
