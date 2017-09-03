@@ -49,15 +49,15 @@ public class EdicionLugarActivity extends AppCompatActivity {
         lugar.setUrl(url.getText().toString());
         lugar.setComentario(comentario.getText().toString());
         if (_id == -1) {
-            _id = MainActivity.adaptador.idPosicion((int) id);
+            _id = SelectorFragment.adaptador.idPosicion((int) id);
         }
         MainActivity.lugares.actualiza((int) _id, lugar);
-        MainActivity.adaptador.setCursor(MainActivity.lugares.extraeCursor());
+        SelectorFragment.adaptador.setCursor(MainActivity.lugares.extraeCursor());
 
         if (id != -1) {
-            MainActivity.adaptador.notifyItemChanged((int) id);
+            SelectorFragment.adaptador.notifyItemChanged((int) id);
         } else {
-            MainActivity.adaptador.notifyDataSetChanged();
+            SelectorFragment.adaptador.notifyDataSetChanged();
         }
         finish();
     }
@@ -80,7 +80,7 @@ public class EdicionLugarActivity extends AppCompatActivity {
         if (_id != -1) {
             lugar = MainActivity.lugares.elemento((int) _id);
         } else {
-            lugar = MainActivity.adaptador.lugarPosicion((int) id);
+            lugar = SelectorFragment.adaptador.lugarPosicion((int) id);
         }
         nombre = (EditText) findViewById(R.id.nombre);
         nombre.setText(lugar.getNombre());

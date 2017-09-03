@@ -75,7 +75,7 @@ public class VistaLugarActivity extends AppCompatActivity {
                 lanzarEdicion((int) id);
                 return true;
             case R.id.accion_borrar:
-                int _id = MainActivity.adaptador.idPosicion((int) id);
+                int _id = SelectorFragment.adaptador.idPosicion((int) id);
                 borrarLugar(_id);
 
                 return true;
@@ -175,9 +175,9 @@ public class VistaLugarActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         MainActivity.lugares.borrar(id);
-                        MainActivity.adaptador.setCursor(
+                        SelectorFragment.adaptador.setCursor(
                                 MainActivity.lugares.extraeCursor());
-                        MainActivity.adaptador.notifyDataSetChanged();
+                        SelectorFragment.adaptador.notifyDataSetChanged();
                         finish();
                     }
                 })
@@ -193,10 +193,10 @@ public class VistaLugarActivity extends AppCompatActivity {
     }
 
     void actualizaLugar() {
-        int _id = MainActivity.adaptador.idPosicion((int) id);
+        int _id = SelectorFragment.adaptador.idPosicion((int) id);
         MainActivity.lugares.actualiza(_id, lugar);
-        MainActivity.adaptador.setCursor(MainActivity.lugares.extraeCursor());
-        MainActivity.adaptador.notifyItemChanged((int) id);
+        SelectorFragment.adaptador.setCursor(MainActivity.lugares.extraeCursor());
+        SelectorFragment.adaptador.notifyItemChanged((int) id);
     }
 
     public static Bitmap reduceBitmap(Context contexto, String uri,
@@ -221,7 +221,7 @@ public class VistaLugarActivity extends AppCompatActivity {
     }
 
     public void actualizarVistas() {
-        lugar = MainActivity.adaptador.lugarPosicion((int) id);
+        lugar = SelectorFragment.adaptador.lugarPosicion((int) id);
         TextView nombre = (TextView) findViewById(R.id.nombre);
         nombre.setText(lugar.getNombre());
         ImageView logo_tipo = (ImageView) findViewById(R.id.logo_tipo);

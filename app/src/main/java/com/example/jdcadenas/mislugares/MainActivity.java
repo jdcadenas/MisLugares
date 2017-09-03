@@ -7,8 +7,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,16 +16,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import static com.example.jdcadenas.mislugares.SelectorFragment.adaptador;
+
 public class MainActivity extends AppCompatActivity {
     private Button bacercaDe;
     private Button bSalir;
     private Button bPreferencias;
     public static LugaresBD lugares;
     public MediaPlayer mp;
-    private RecyclerView recyclerView;
-    public static AdapatadorLugaresBD adaptador;
-    private RecyclerView.LayoutManager layoutManager;
-
+    private VistaLugarFragment fragmentVista;
     @Override
     protected void onPause() {
         Toast.makeText(this, "en pausa", Toast.LENGTH_SHORT).show();
@@ -42,13 +39,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mp = MediaPlayer.create(this, R.raw.audio);
         mp.start();
+        fragmentVista = (VistaLugarFragment) getSupportFragmentManager().findFragmentById(R.id.vista_lugar_fragment);
 
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         adaptador = new AdapatadorLugaresBD(this, lugares, lugares.extraeCursor());
-        recyclerView.setAdapter(adaptador);
-        layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -68,11 +61,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, VistaLugarActivity.class);
-                i.putExtra("id", (long) recyclerView.getChildAdapterPosition(v));
+
                 startActivity(i);
             }
         });
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        SelectorFragment.adaptador.setCursor(MainActivity.lugares.extraeCursor());
+        SelectorFragment.adaptador.notifyDataSetChanged();
     }
 
     public void lanzarAcercaDe(View view) {
@@ -115,6 +115,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (fragmentVista != null && SelectorFragment.adaptador.getItemCount() > 0) {
+            fragmentVista.actualizarVistas(0);
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -136,6 +144,16 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void muestraLugar(long id) {
+        if (fragmentVista != null) {
+            fragmentVista.actualizarVistas(id);
+        } else {
+            Intent intent = new Intent(this, VistaLugarActivity.class);
+            intent.putExtra("id", id);
+            startActivityForResult(intent, 0);
+        }
     }
 
 }
